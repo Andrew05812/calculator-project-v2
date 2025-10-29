@@ -161,39 +161,92 @@ function calculate() {
     updateDisplay();
 }
 
-// ===== ЗАГЛУШКИ ДЛЯ ФУНКЦИЙ ВТОРОГО РАЗРАБОТЧИКА =====
-// Эти функции будет реализовывать второй аккаунт (BuMcHiKa)
+// ===== ОПЕРАЦИИ ВТОРОГО РАЗРАБОТЧИКА (BuMcHiKa) =====
 
+// ===== ОПЕРАЦИЯ 7: COS =====
 function calculateCos() {
-    alert('Функция COS будет добавлена разработчиком BuMcHiKa');
+    const value = parseFloat(currentValue);
+    if (isNaN(value)) {
+        alert('Ошибка: введите число');
+        return;
+    }
+    // Переводим градусы в радианы
+    const radians = value * (Math.PI / 180);
+    currentValue = Math.cos(radians).toString();
+    updateDisplay();
 }
 
+// ===== ОПЕРАЦИЯ 8: ВОЗВЕДЕНИЕ В СТЕПЕНЬ =====
 function power() {
-    alert('Функция возведения в степень будет добавлена разработчиком BuMcHiKa');
+    if (currentValue === '') return;
+    if (previousValue !== '' && operation !== null) {
+        calculate();
+    }
+    operation = 'power';
+    previousValue = currentValue;
+    currentValue = '0';
 }
 
+// ===== ОПЕРАЦИЯ 9: КВАДРАТНЫЙ КОРЕНЬ =====
 function calculateSqrt() {
-    alert('Функция квадратного корня будет добавлена разработчиком BuMcHiKa');
+    const value = parseFloat(currentValue);
+    if (isNaN(value)) {
+        alert('Ошибка: введите число');
+        return;
+    }
+    if (value < 0) {
+        alert('Ошибка: невозможно извлечь корень из отрицательного числа!');
+        return;
+    }
+    currentValue = Math.sqrt(value).toString();
+    updateDisplay();
 }
 
+// ===== ОПЕРАЦИЯ 10: ОКРУГЛЕНИЕ ВНИЗ (FLOOR) =====
 function floorValue() {
-    alert('Функция округления вниз будет добавлена разработчиком BuMcHiKa');
+    const value = parseFloat(currentValue);
+    if (isNaN(value)) {
+        alert('Ошибка: введите число');
+        return;
+    }
+    currentValue = Math.floor(value).toString();
+    updateDisplay();
 }
 
+// ===== ОПЕРАЦИЯ 11: ОКРУГЛЕНИЕ ВВЕРХ (CEIL) =====
 function ceilValue() {
-    alert('Функция округления вверх будет добавлена разработчиком BuMcHiKa');
+    const value = parseFloat(currentValue);
+    if (isNaN(value)) {
+        alert('Ошибка: введите число');
+        return;
+    }
+    currentValue = Math.ceil(value).toString();
+    updateDisplay();
 }
 
+// ===== ОПЕРАЦИЯ 12: РАБОТА С ПАМЯТЬЮ =====
+
+// M+ (добавить в память)
 function memoryAdd() {
-    alert('Функция памяти M+ будет добавлена разработчиком BuMcHiKa');
+    const value = parseFloat(currentValue);
+    if (isNaN(value)) {
+        alert('Ошибка: введите число');
+        return;
+    }
+    memory += value;
+    alert('Добавлено в память: ' + value + '\nТекущее значение памяти: ' + memory);
 }
 
+// MC (очистить память)
 function memoryClear() {
-    alert('Функция памяти MC будет добавлена разработчиком BuMcHiKa');
+    memory = 0;
+    alert('Память очищена');
 }
 
+// MR (вызвать из памяти)
 function memoryRecall() {
-    alert('Функция памяти MR будет добавлена разработчиком BuMcHiKa');
+    currentValue = memory.toString();
+    updateDisplay();
 }
 
 // Инициализация
@@ -201,4 +254,4 @@ updateDisplay();
 
 console.log('=== Калькулятор v2.0 ===');
 console.log('Разработчик 1 (andrew05812): Базовые операции (+, -, ×, ÷, %, sin)');
-console.log('Разработчик 2 (BuMcHiKa): Продвинутые функции (будут добавлены)');
+console.log('Разработчик 2 (BuMcHiKa): Продвинутые функции (cos, степень, корень, округления, память) - ГОТОВО!');
