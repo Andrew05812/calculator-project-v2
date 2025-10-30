@@ -1,257 +1,210 @@
-// Глобальные переменные
-let currentValue = '0';
-let previousValue = '';
-let operation = null;
-let memory = 0;
+// script.js - UI логика калькулятора
+
+// Создание экземпляра калькулятора
+const calc = new Calculator();
 
 // Получение элемента дисплея
 const display = document.getElementById('display');
 
 // Обновление дисплея
 function updateDisplay() {
-    display.value = currentValue;
+    display.value = calc.getCurrentValue();
 }
 
 // Добавление символа на дисплей
 function appendToDisplay(value) {
-    if (currentValue === '0' && value !== '.') {
-        currentValue = value;
-    } else if (currentValue === '0' && value === '.') {
-        currentValue = '0.';
+    let current = calc.getCurrentValue();
+    
+    if (current === '0' && value !== '.') {
+        calc.setCurrentValue(value);
+    } else if (current === '0' && value === '.') {
+        calc.setCurrentValue('0.');
     } else {
-        // Запрет на несколько точек
-        if (value === '.' && currentValue.includes('.')) return;
-        currentValue += value;
+        if (value === '.' && current.includes('.')) return;
+        calc.setCurrentValue(current + value);
     }
     updateDisplay();
 }
 
 // Очистка дисплея
 function clearDisplay() {
-    currentValue = '0';
-    previousValue = '';
-    operation = null;
+    calc.clear();
     updateDisplay();
 }
 
 // Удаление последнего символа
 function deleteLastChar() {
-    if (currentValue.length > 1) {
-        currentValue = currentValue.slice(0, -1);
+    let current = calc.getCurrentValue();
+    if (current.length > 1) {
+        calc.setCurrentValue(current.slice(0, -1));
     } else {
-        currentValue = '0';
+        calc.setCurrentValue('0');
     }
     updateDisplay();
 }
 
-// ===== ОПЕРАЦИЯ 1: СЛОЖЕНИЕ =====
+// Операции с двумя операндами
+let previousValue = '';
+let operation = null;
+
 function add() {
-    if (currentValue === '') return;
-    if (previousValue !== '' && operation !== null) {
-        calculate();
-    }
-    operation = 'add';
-    previousValue = currentValue;
-    currentValue = '0';
+    setOperation('add');
 }
 
-// ===== ОПЕРАЦИЯ 2: ВЫЧИТАНИЕ =====
 function subtract() {
-    if (currentValue === '') return;
-    if (previousValue !== '' && operation !== null) {
-        calculate();
-    }
-    operation = 'subtract';
-    previousValue = currentValue;
-    currentValue = '0';
+    setOperation('subtract');
 }
 
-// ===== ОПЕРАЦИЯ 3: УМНОЖЕНИЕ =====
 function multiply() {
-    if (currentValue === '') return;
-    if (previousValue !== '' && operation !== null) {
-        calculate();
-    }
-    operation = 'multiply';
-    previousValue = currentValue;
-    currentValue = '0';
+    setOperation('multiply');
 }
 
-// ===== ОПЕРАЦИЯ 4: ДЕЛЕНИЕ =====
 function divide() {
-    if (currentValue === '') return;
-    if (previousValue !== '' && operation !== null) {
-        calculate();
-    }
-    operation = 'divide';
-    previousValue = currentValue;
-    currentValue = '0';
+    setOperation('divide');
 }
 
-// ===== ОПЕРАЦИЯ 5: ОСТАТОК ОТ ДЕЛЕНИЯ =====
 function modulo() {
-    if (currentValue === '') return;
+    setOperation('modulo');
+}
+
+function power() {
+    setOperation('power');
+}
+
+function setOperation(op) {
+    if (calc.getCurrentValue() === '') return;
     if (previousValue !== '' && operation !== null) {
         calculate();
     }
-    operation = 'modulo';
-    previousValue = currentValue;
-    currentValue = '0';
-}
-
-// ===== ОПЕРАЦИЯ 6: SIN =====
-function calculateSin() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
-    }
-    // Переводим градусы в радианы
-    const radians = value * (Math.PI / 180);
-    currentValue = Math.sin(radians).toString();
-    updateDisplay();
+    operation = op;
+    previousValue = calc.getCurrentValue();
+    calc.setCurrentValue('0');
 }
 
 // Вычисление результата
 function calculate() {
-    let result;
-    const prev = parseFloat(previousValue);
-    const current = parseFloat(currentValue);
-    
-    if (isNaN(prev) || isNaN(current)) return;
-    
-    switch(operation) {
-        case 'add':
-            result = prev + current;
-            break;
-        case 'subtract':
-            result = prev - current;
-            break;
-        case 'multiply':
-            result = prev * current;
-            break;
-        case 'divide':
-            if (current === 0) {
-                alert('Ошибка: деление на ноль!');
-                clearDisplay();
-                return;
-            }
-            result = prev / current;
-            break;
-        case 'modulo':
-            if (current === 0) {
-                alert('Ошибка: деление на ноль!');
-                clearDisplay();
-                return;
-            }
-            result = prev % current;
-            break;
-        case 'power':
-            result = Math.pow(prev, current);
-            break;
-        default:
+    try {
+        const prev = parseFloat(previousValue);
+        const current = parseFloat(calc.getCurrentValue());
+        
+        if (isNaN(prev) || isNaN(current)) return;
+        
+        const result = calc.calculate(operation, prev, current);
+        calc.setCurrentValue(Math.round(result * 10000000000) / 10000000000);
+        operation = null;
+        previousValue = '';
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
+        clearDisplay();
+    }
+}
+
+// Унарные операции
+function calculateSin() {
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
             return;
+        }
+        const result = calc.sin(value);
+        calc.setCurrentValue(result);
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    
-    // Округляем до 10 знаков после запятой
-    currentValue = Math.round(result * 10000000000) / 10000000000;
-    currentValue = currentValue.toString();
-    operation = null;
-    previousValue = '';
-    updateDisplay();
 }
 
-// ===== ОПЕРАЦИИ ВТОРОГО РАЗРАБОТЧИКА (BuMcHiKa) =====
-
-// ===== ОПЕРАЦИЯ 7: COS =====
 function calculateCos() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
+            return;
+        }
+        const result = calc.cos(value);
+        calc.setCurrentValue(result);
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    // Переводим градусы в радианы
-    const radians = value * (Math.PI / 180);
-    currentValue = Math.cos(radians).toString();
-    updateDisplay();
 }
 
-// ===== ОПЕРАЦИЯ 8: ВОЗВЕДЕНИЕ В СТЕПЕНЬ =====
-function power() {
-    if (currentValue === '') return;
-    if (previousValue !== '' && operation !== null) {
-        calculate();
-    }
-    operation = 'power';
-    previousValue = currentValue;
-    currentValue = '0';
-}
-
-// ===== ОПЕРАЦИЯ 9: КВАДРАТНЫЙ КОРЕНЬ =====
 function calculateSqrt() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
+            return;
+        }
+        const result = calc.sqrt(value);
+        calc.setCurrentValue(result);
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    if (value < 0) {
-        alert('Ошибка: невозможно извлечь корень из отрицательного числа!');
-        return;
-    }
-    currentValue = Math.sqrt(value).toString();
-    updateDisplay();
 }
 
-// ===== ОПЕРАЦИЯ 10: ОКРУГЛЕНИЕ ВНИЗ (FLOOR) =====
 function floorValue() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
+            return;
+        }
+        const result = calc.floor(value);
+        calc.setCurrentValue(result);
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    currentValue = Math.floor(value).toString();
-    updateDisplay();
 }
 
-// ===== ОПЕРАЦИЯ 11: ОКРУГЛЕНИЕ ВВЕРХ (CEIL) =====
 function ceilValue() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
+            return;
+        }
+        const result = calc.ceil(value);
+        calc.setCurrentValue(result);
+        updateDisplay();
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    currentValue = Math.ceil(value).toString();
-    updateDisplay();
 }
 
-// ===== ОПЕРАЦИЯ 12: РАБОТА С ПАМЯТЬЮ =====
-
-// M+ (добавить в память)
+// Работа с памятью
 function memoryAdd() {
-    const value = parseFloat(currentValue);
-    if (isNaN(value)) {
-        alert('Ошибка: введите число');
-        return;
+    try {
+        const value = parseFloat(calc.getCurrentValue());
+        if (isNaN(value)) {
+            alert('Ошибка: введите число');
+            return;
+        }
+        const memory = calc.memoryAdd(value);
+        alert('Добавлено в память: ' + value + '\nТекущее значение памяти: ' + memory);
+    } catch (error) {
+        alert('Ошибка: ' + error.message);
     }
-    memory += value;
-    alert('Добавлено в память: ' + value + '\nТекущее значение памяти: ' + memory);
 }
 
-// MC (очистить память)
 function memoryClear() {
-    memory = 0;
+    calc.memoryClear();
     alert('Память очищена');
 }
 
-// MR (вызвать из памяти)
 function memoryRecall() {
-    currentValue = memory.toString();
+    const memory = calc.memoryRecall();
+    calc.setCurrentValue(memory);
     updateDisplay();
 }
 
 // Инициализация
 updateDisplay();
 
-console.log('=== Калькулятор v2.0 ===');
-console.log('Разработчик 1 (andrew05812): Базовые операции (+, -, ×, ÷, %, sin)');
-console.log('Разработчик 2 (BuMcHiKa): Продвинутые функции (cos, степень, корень, округления, память) - ГОТОВО!');
+console.log('=== Калькулятор v3.0 с Unit-тестами ===');
+console.log('Разработчик 1 (andrew05812): Рефакторинг + тесты для операций 1-6');
+console.log('Разработчик 2 (BuMcHiKa): Тесты для операций 7-12');

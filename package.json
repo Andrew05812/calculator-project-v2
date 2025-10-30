@@ -1,0 +1,25 @@
+{
+  "name": "calculator-project-v2",
+  "version": "1.0.0",
+  "description": "Групповой проект по изучению системы контроля версий Git и совместной разработки.",
+  "main": "calculator.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrew05812/calculator-project-v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/andrew05812/calculator-project-v2/issues"
+  },
+  "homepage": "https://github.com/andrew05812/calculator-project-v2#readme",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
