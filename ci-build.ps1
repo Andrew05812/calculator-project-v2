@@ -1,4 +1,4 @@
-# ========================================
+﻿# ========================================
 # CI/CD Скрипт для Научного калькулятора
 # Практическая работа №5
 # Разработчик: andrew05812
@@ -57,10 +57,11 @@ Write-Host "`n"
 
 $StartTime = Get-Date
 
+# ========================================
+# ОСНОВНОЙ БЛОК ВЫПОЛНЕНИЯ
+# ========================================
 try {
-    # ========================================
     # ШАГ 1: ЗАГРУЗКА АКТУАЛЬНОГО СОСТОЯНИЯ
-    # ========================================
     Write-Step "ШАГ 1/5: Загрузка актуального состояния с сервера"
     
     Write-Info "Проверка Git репозитория..."
@@ -90,9 +91,7 @@ try {
     Write-Info "Последний коммит: $(git log -1 --pretty=format:'%h - %s (%an)')"
     Write-Success "Шаг 1 завершён успешно!"
 
-    # ========================================
     # ШАГ 2: СБОРКА ПРОЕКТА И UNIT-ТЕСТОВ
-    # ========================================
     Write-Step "ШАГ 2/5: Сборка проекта и подготовка unit-тестов"
     
     Write-Info "Проверка наличия Node.js..."
@@ -135,9 +134,7 @@ try {
     Write-Success "Все необходимые файлы найдены"
     Write-Success "Шаг 2 завершён успешно!"
 
-    # ========================================
     # ШАГ 3: ВЫПОЛНЕНИЕ UNIT-ТЕСТОВ
-    # ========================================
     if (-not $SkipTests) {
         Write-Step "ШАГ 3/5: Выполнение unit-тестов"
         
@@ -161,9 +158,7 @@ try {
         Write-Warning "Тесты пропущены по запросу пользователя"
     }
 
-    # ========================================
     # ШАГ 4: СОЗДАНИЕ УСТАНОВЩИКА
-    # ========================================
     if (-not $SkipInstaller) {
         Write-Step "ШАГ 4/5: Создание установочного пакета"
         
@@ -231,8 +226,7 @@ try {
         Write-Info "Проверка созданного установщика..."
         $installerPath = "output\ScientificCalculator-Setup-v$Version.exe"
         if (-not (Test-Path $installerPath)) {
-            # Попробуем найти любой .exe в output
-            $anyInstaller = Get-ChildItem "output\*.exe" | Select-Object -First 1
+            $anyInstaller = Get-ChildItem "output\*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
             if ($anyInstaller) {
                 $installerPath = $anyInstaller.FullName
                 Write-Warning "Найден установщик: $installerPath"
@@ -251,13 +245,11 @@ try {
         Write-Warning "Создание установщика пропущено по запросу пользователя"
     }
 
-    # ========================================
     # ШАГ 5: УСТАНОВКА ПРИЛОЖЕНИЯ
-    # ========================================
     Write-Step "ШАГ 5/5: Установка приложения"
     
     Write-Info "Поиск установщика..."
-    $installerPath = Get-ChildItem "output\*.exe" | Select-Object -First 1
+    $installerPath = Get-ChildItem "output\*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
     
     if ($installerPath) {
         Write-Success "Установщик найден: $($installerPath.Name)"
@@ -282,9 +274,7 @@ try {
     
     Write-Success "Шаг 5 завершён!"
 
-    # ========================================
     # ЗАВЕРШЕНИЕ
-    # ========================================
     $EndTime = Get-Date
     $Duration = $EndTime - $StartTime
     
@@ -310,7 +300,8 @@ try {
     Write-Host "`n"
     
     exit 0
-} catch {
+}
+catch {
     Write-Host "`n"
     Write-Host "╔════════════════════════════════════════════════════════╗" -ForegroundColor $ColorError
     Write-Host "║                ОШИБКА ПРИ СБОРКЕ!                     ║" -ForegroundColor $ColorError
